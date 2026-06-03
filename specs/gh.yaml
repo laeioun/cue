@@ -1,0 +1,208 @@
+name: gh
+description: GitHub CLI
+subcommands:
+  - name: auth
+    description: Authenticate gh and git with GitHub
+    subcommands:
+      - { name: login,     description: Log in to a GitHub account }
+      - { name: logout,    description: Log out of a GitHub account }
+      - { name: refresh,   description: Expand or fix the permission scopes for stored credentials }
+      - { name: setup-git, description: Configure git to use GitHub CLI as a credential helper }
+      - { name: status,    description: Display active account and authentication state }
+      - { name: switch,    description: Switch between GitHub accounts }
+      - { name: token,     description: Print the authentication token for the active account }
+
+  - name: pr
+    description: Manage pull requests
+    subcommands:
+      - { name: checkout,      description: Check out a pull request in git }
+      - { name: checks,        description: Show CI status for a single pull request }
+      - { name: close,         description: Close a pull request }
+      - { name: comment,       description: Add a comment to a pull request }
+      - { name: create,        description: Create a pull request }
+      - { name: diff,          description: View changes in a pull request }
+      - { name: edit,          description: Edit a pull request }
+      - { name: list,          description: List pull requests in a repository }
+      - { name: lock,          description: Lock pull request conversation }
+      - { name: merge,         description: Merge a pull request }
+      - { name: ready,         description: Mark a pull request as ready for review }
+      - { name: reopen,        description: Reopen a pull request }
+      - { name: review,        description: Add a review to a pull request }
+      - { name: status,        description: Show status of relevant pull requests }
+      - { name: unlock,        description: Unlock pull request conversation }
+      - { name: update-branch, description: Update a pull request branch }
+      - { name: view,          description: View a pull request }
+
+  - name: issue
+    description: Manage issues
+    subcommands:
+      - { name: close,    description: Close issue }
+      - { name: comment,  description: Add a comment to an issue }
+      - { name: create,   description: Create a new issue }
+      - { name: delete,   description: Delete issue }
+      - { name: develop,  description: Manage linked branches for an issue }
+      - { name: edit,     description: Edit an issue }
+      - { name: list,     description: List issues in a repository }
+      - { name: lock,     description: Lock issue conversation }
+      - { name: pin,      description: Pin a issue to a repository }
+      - { name: reopen,   description: Reopen an issue }
+      - { name: status,   description: Show status of relevant issues }
+      - { name: transfer, description: Transfer issue to another repository }
+      - { name: unpin,    description: Unpin a issue from a repository }
+      - { name: unlock,   description: Unlock issue conversation }
+      - { name: view,     description: View an issue }
+
+  - name: repo
+    description: Manage repositories
+    subcommands:
+      - { name: archive,     description: Archive a GitHub repository }
+      - { name: clone,       description: Clone a GitHub repository locally }
+      - { name: create,      description: Create a new GitHub repository }
+      - { name: delete,      description: Delete a GitHub repository }
+      - { name: deploy-key,  description: Manage deploy keys in a repository }
+      - { name: edit,        description: Edit repository settings }
+      - { name: fork,        description: Create a fork of a repository }
+      - { name: list,        description: List repositories owned by user or org }
+      - { name: rename,      description: Rename a GitHub repository }
+      - { name: set-default, description: Configure default repository for this directory }
+      - { name: sync,        description: Sync a repository }
+      - { name: unarchive,   description: Unarchive a GitHub repository }
+      - { name: view,        description: View a repository }
+
+  - name: release
+    description: Manage GitHub releases
+    subcommands:
+      - { name: create,       description: Create a new release }
+      - { name: delete,       description: Delete a release }
+      - { name: delete-asset, description: Delete an asset from a release }
+      - { name: download,     description: Download release assets }
+      - { name: edit,         description: Edit a release }
+      - { name: list,         description: List releases in a repository }
+      - { name: upload,       description: Upload assets to a release }
+      - { name: view,         description: View information about a release }
+
+  - name: workflow
+    description: View details about GitHub Actions workflows
+    subcommands:
+      - { name: disable, description: Disable a workflow }
+      - { name: enable,  description: Enable a workflow }
+      - { name: list,    description: List workflows }
+      - { name: run,     description: Run a workflow by creating a workflow_dispatch event }
+      - { name: view,    description: View the summary of a workflow }
+
+  - name: run
+    description: View details about workflow runs
+    subcommands:
+      - { name: cancel,   description: Cancel a workflow run }
+      - { name: delete,   description: Delete a workflow run }
+      - { name: download, description: Download artifacts generated by a workflow run }
+      - { name: list,     description: List recent workflow runs }
+      - { name: rerun,    description: Rerun an entire run }
+      - { name: view,     description: View a summary of a workflow run }
+      - { name: watch,    description: Watch a run until it completes }
+
+  - name: gist
+    description: Manage gists
+    subcommands:
+      - { name: clone,  description: Clone a gist locally }
+      - { name: create, description: Create a new gist }
+      - { name: delete, description: Delete a gist }
+      - { name: edit,   description: Edit one of your gists }
+      - { name: list,   description: List your gists }
+      - { name: rename, description: Rename a file in a gist }
+      - { name: view,   description: View a gist }
+
+  - name: codespace
+    description: Connect to and manage codespaces
+    subcommands:
+      - { name: code,    description: Open a codespace in VS Code }
+      - { name: cp,      description: Copy files between local and remote file systems }
+      - { name: create,  description: Create a codespace }
+      - { name: delete,  description: Delete a codespace }
+      - { name: edit,    description: Edit a codespace }
+      - { name: list,    description: List codespaces }
+      - { name: ports,   description: List ports in a codespace }
+      - { name: rebuild, description: Rebuild a codespace }
+      - { name: ssh,     description: SSH into a codespace }
+      - { name: stop,    description: Stop a running codespace }
+      - { name: view,    description: View details about a codespace }
+
+  - name: secret
+    description: Manage GitHub secrets
+    subcommands:
+      - { name: delete, description: Delete secrets }
+      - { name: list,   description: List secrets }
+      - { name: set,    description: Create or update secrets }
+
+  - name: variable
+    description: Manage GitHub Actions variables
+    subcommands:
+      - { name: delete, description: Delete a variable }
+      - { name: get,    description: Get variables }
+      - { name: list,   description: List variables }
+      - { name: set,    description: Create or update variables }
+
+  - name: ssh-key
+    description: Manage SSH keys
+    subcommands:
+      - { name: add,    description: Add an SSH key to your GitHub account }
+      - { name: delete, description: Delete an SSH key from your GitHub account }
+      - { name: list,   description: Lists SSH keys in your GitHub account }
+
+  - name: extension
+    description: Manage gh extensions
+    subcommands:
+      - { name: browse,   description: Enter a UI for browsing, adding, and removing extensions }
+      - { name: exec,     description: Execute an installed extension }
+      - { name: install,  description: Install a gh extension from a repository }
+      - { name: list,     description: List installed extension commands }
+      - { name: remove,   description: Remove an installed extension }
+      - { name: search,   description: Search extensions to the GitHub CLI }
+      - { name: upgrade,  description: Upgrade installed extensions }
+
+  - name: api
+    description: Make authenticated GitHub API requests
+    flags: [--method, -X, --field, -f, --raw-field, -F, --header, -H, --input, --paginate, --preview, --silent, --template, -t, --verbose, -v, --jq, -q]
+
+  - name: search
+    description: Search across resources on GitHub
+    subcommands:
+      - { name: code,         description: Search within code }
+      - { name: commits,      description: Search for commits }
+      - { name: issues,       description: Search for issues }
+      - { name: prs,          description: Search for pull requests }
+      - { name: repos,        description: Search for repositories }
+
+  - name: project
+    description: Work with GitHub Projects
+    subcommands:
+      - { name: close,         description: Close a project }
+      - { name: copy,          description: Copy a project }
+      - { name: create,        description: Create a project }
+      - { name: delete,        description: Delete a project }
+      - { name: edit,          description: Edit a project }
+      - { name: field-create,  description: Create a field in a project }
+      - { name: field-delete,  description: Delete a field in a project }
+      - { name: field-list,    description: List the fields in a project }
+      - { name: item-add,      description: Add a pull request or an issue to a project }
+      - { name: item-archive,  description: Archive an item in a project }
+      - { name: item-create,   description: Create a draft issue item in a project }
+      - { name: item-delete,   description: Delete an item in a project }
+      - { name: item-edit,     description: Edit an item in a project }
+      - { name: item-list,     description: List the items in a project }
+      - { name: list,          description: List the projects for an owner }
+      - { name: mark-template, description: Mark a project as a template }
+      - { name: view,          description: View a project }
+
+  - name: org
+    description: Manage organizations
+    subcommands:
+      - { name: list, description: List organizations for the authenticated user }
+
+  - name: browse
+    description: Open the repository in the browser
+    flags: [--branch, -b, --commit, -c, --no-browser, -n, --projects, -p, --releases, -r, --settings, -s, --wiki, -w]
+
+  - name: status
+    description: Print information about relevant issues, PRs, and notifications
+    flags: [--exclude, -e, --org, -o]

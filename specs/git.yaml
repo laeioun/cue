@@ -1,0 +1,115 @@
+name: git
+description: Distributed version control system
+subcommands:
+  - name: add
+    description: Stage file contents to the index
+    flags: [--all, -A, --patch, -p, --force, -f, --interactive, -i, --verbose, -v, --dry-run, -n]
+  - name: bisect
+    description: Find the commit that introduced a bug
+    subcommands:
+      - { name: start, description: Start bisection }
+      - { name: good,  description: Mark current commit as good }
+      - { name: bad,   description: Mark current commit as bad }
+      - { name: reset, description: End bisection }
+      - { name: log,   description: Show bisect log }
+  - name: branch
+    description: List, create, or delete branches
+    flags: [--all, -a, --delete, -d, --force, -f, --move, -m, --remote, -r, --verbose, -v, --merged, --no-merged, --list]
+  - name: checkout
+    description: Switch branches or restore working tree files
+    flags: [--branch, -b, --force, -f, --track, -t, --detach, --orphan, --patch, -p]
+  - name: cherry-pick
+    description: Apply specific commits
+    flags: [--continue, --abort, --quit, --no-commit, -n, --edit, -e, --signoff, -s]
+  - name: clean
+    description: Remove untracked files from the working tree
+    flags: [--force, -f, --dry-run, -n, --interactive, -i, --directories, -d, --quiet, -q]
+  - name: clone
+    description: Clone a repository into a new directory
+    flags: [--branch, -b, --depth, --recursive, --shallow-submodules, --no-tags, --quiet, -q, --verbose, -v, --origin, -o]
+  - name: commit
+    description: Record changes to the repository
+    flags: [--message, -m, --amend, --no-edit, --all, -a, --verbose, -v, --signoff, -s, --allow-empty, --squash, --fixup, --no-verify, -n, --patch, -p]
+  - name: config
+    description: Get and set repository or global options
+    flags: [--global, --local, --system, --list, -l, --get, --set, --unset, --edit, -e, --add, --type]
+  - name: diff
+    description: Show changes between commits or working tree
+    flags: [--stat, --cached, --staged, --name-only, --name-status, --color, --word-diff, --unified, -U, --patch, -p]
+  - name: fetch
+    description: Download objects and refs from another repository
+    flags: [--all, --prune, -p, --tags, -t, --depth, --force, -f, --quiet, -q, --verbose, -v, --dry-run]
+  - name: init
+    description: Create an empty Git repository
+    flags: [--bare, --quiet, -q, --initial-branch, -b, --template]
+  - name: log
+    description: Show the commit history
+    flags: [--oneline, --graph, --all, --decorate, --follow, --format, --pretty, --author, --since, --until, --grep, --patch, -p, --stat, --reverse, --no-merges, -n, --max-count]
+  - name: merge
+    description: Join two or more development histories together
+    flags: [--no-ff, --ff-only, --squash, --abort, --continue, --message, -m, --verbose, -v, --no-commit, --edit, -e]
+  - name: mv
+    description: Move or rename a file or directory
+    flags: [--force, -f, --dry-run, -n, --verbose, -v]
+  - name: pull
+    description: Fetch from and integrate with another repository
+    flags: [--rebase, --no-rebase, --ff-only, --no-ff, --verbose, -v, --quiet, -q, --depth, --all, --tags]
+  - name: push
+    description: Update remote refs along with associated objects
+    flags: [--force, -f, --force-with-lease, --tags, --delete, -d, --dry-run, -n, --set-upstream, -u, --verbose, -v, --quiet, -q, --all]
+  - name: rebase
+    description: Reapply commits on top of another base tip
+    flags: [--interactive, -i, --continue, --abort, --skip, --onto, --autosquash, --no-autosquash, --verbose, -v, --exec, -x]
+  - name: remote
+    description: Manage set of tracked repositories
+    subcommands:
+      - { name: add,     description: Add a new remote }
+      - { name: remove,  description: Remove a remote }
+      - { name: rename,  description: Rename a remote }
+      - { name: show,    description: Show information about a remote }
+      - { name: set-url, description: Change the URL for a remote }
+      - { name: prune,   description: Delete stale tracking branches }
+      - { name: get-url, description: Get the URL for a remote }
+    flags: [--verbose, -v]
+  - name: reset
+    description: Reset current HEAD to the specified state
+    flags: [--soft, --mixed, --hard, --merge, --keep, --patch, -p, --quiet, -q]
+  - name: restore
+    description: Restore working tree files
+    flags: [--staged, --worktree, --source, -s, --patch, -p, --quiet, -q]
+  - name: revert
+    description: Revert some existing commits
+    flags: [--no-commit, -n, --edit, -e, --no-edit, --mainline, -m, --signoff, -s]
+  - name: rm
+    description: Remove files from the working tree and index
+    flags: [--force, -f, --cached, --recursive, -r, --dry-run, -n, --quiet, -q]
+  - name: show
+    description: Show various types of objects
+    flags: [--stat, --name-only, --format, --pretty, --oneline, --patch, -p, --no-patch, -s]
+  - name: stash
+    description: Stash changes in a dirty working directory
+    subcommands:
+      - { name: push,    description: Save changes to a new stash entry }
+      - { name: pop,     description: Apply stash and remove from list }
+      - { name: apply,   description: Apply stash without removing }
+      - { name: list,    description: List stash entries }
+      - { name: drop,    description: Remove a single stash entry }
+      - { name: clear,   description: Remove all stash entries }
+      - { name: show,    description: Show changes in a stash }
+      - { name: branch,  description: Create branch from stash }
+    flags: [--include-untracked, -u, --all, -a, --message, -m, --patch, -p]
+  - name: status
+    description: Show the working tree status
+    flags: [--short, -s, --branch, -b, --verbose, -v, --long, --porcelain, --ahead-behind, --no-ahead-behind]
+  - name: switch
+    description: Switch branches
+    flags: [--create, -c, --force-create, -C, --detach, -d, --force, -f, --track, -t, --no-track, --guess, --no-guess, --quiet, -q]
+  - name: tag
+    description: Create, list, delete or verify a tag object
+    flags: [--annotate, -a, --message, -m, --delete, -d, --force, -f, --list, -l, --sort, --verify, -v, --sign, -s]
+  - name: format-patch
+    description: Prepare patches for e-mail submission
+    flags: [--stdout, --numbered, -N, --start-number, --thread, --in-reply-to, --cover-letter, --output-directory, -o]
+  - name: grep
+    description: Print lines matching a pattern
+    flags: [--count, -c, --line-number, -n, --word-regexp, -w, --invert-match, -v, --ignore-case, -i, --extended-regexp, -E, --perl-regexp, -P]

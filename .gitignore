@@ -1,0 +1,7 @@
+cue
+dist/
+bin/
+*.exe
+*.test
+coverage.out
+.DS_Store
