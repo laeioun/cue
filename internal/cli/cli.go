@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/laeioun/cue/internal/aliases"
 	"github.com/laeioun/cue/internal/completion"
 	"github.com/laeioun/cue/internal/picker"
 )
@@ -32,8 +33,23 @@ func New(specs fs.FS) *cobra.Command {
 				return err
 			}
 
-			completions, err := completion.Complete(specs, line, cursor)
+			workingLine, workingCursor := line, cursor
+			aliasMap, err := aliases.Load()
+			if err == nil {
+				workingLine, workingCursor, _ = aliases.Expand(line, cursor, aliasMap)
+			}
+
+			completions, err := completion.Complete(specs, workingLine, workingCursor)
 			if err != nil || len(completions) == 0 {
+				if workingLine != line {
+					fmt.Println(workingLine)
+				}
+				return nil
+			}
+
+			_, partial := completion.Parse(workingLine, workingCursor)
+			if selected, ok := completion.FastSelection(completions, partial); ok {
+				fmt.Println(completion.ApplyCompletion(workingLine, workingCursor, selected))
 				return nil
 			}
 
@@ -42,7 +58,7 @@ func New(specs fs.FS) *cobra.Command {
 				return nil
 			}
 			if selected != "" {
-				fmt.Println(completion.ApplyCompletion(line, cursor, selected))
+				fmt.Println(completion.ApplyCompletion(workingLine, workingCursor, selected))
 			}
 			return nil
 		},

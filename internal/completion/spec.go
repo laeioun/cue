@@ -49,8 +49,13 @@ func Query(root *Node, tokens []string) []Completion {
 	}
 
 	current := root
+	usedFlags := map[string]bool{}
 	for _, token := range tokens[1:] {
-		if token == "" || strings.HasPrefix(token, "-") {
+		if token == "" {
+			continue
+		}
+		if strings.HasPrefix(token, "-") {
+			usedFlags[token] = true
 			continue
 		}
 		if child := current.child(token); child != nil {
@@ -66,6 +71,9 @@ func Query(root *Node, tokens []string) []Completion {
 		})
 	}
 	for _, flag := range current.Flags {
+		if usedFlags[flag] {
+			continue
+		}
 		completions = append(completions, Completion{Name: flag})
 	}
 	return completions
