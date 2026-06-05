@@ -21,6 +21,7 @@ func New(specs fs.FS) *cobra.Command {
 		Use:   "cue",
 		Short: "Tab completion picker for command-line tools",
 	}
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
 	completeCmd := &cobra.Command{
 		Use:   "complete <buffer> <cursor>",
@@ -65,5 +66,7 @@ func New(specs fs.FS) *cobra.Command {
 	}
 
 	rootCmd.AddCommand(completeCmd)
+	rootCmd.AddCommand(initCmd())
+	rootCmd.AddCommand(installCmd())
 	return rootCmd
 }

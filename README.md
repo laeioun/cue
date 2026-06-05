@@ -18,36 +18,41 @@ go install github.com/laeioun/cue@latest
 Then source the integration for your shell:
 
 ```bash
-# bash
-mkdir -p ~/.config/cue
-curl -fsSL https://raw.githubusercontent.com/laeioun/cue/main/scripts/init.bash -o ~/.config/cue/init.bash
-source ~/.config/cue/init.bash
+cue install
+```
 
-# zsh
-mkdir -p ~/.config/cue
-curl -fsSL https://raw.githubusercontent.com/laeioun/cue/main/scripts/init.zsh -o ~/.config/cue/init.zsh
-source ~/.config/cue/init.zsh
+Or add one line manually:
+
+```bash
+# ~/.bashrc
+eval "$(cue init bash)"
+
+# ~/.zshrc
+eval "$(cue init zsh)"
+
+# ~/.config/fish/config.fish
+cue init fish | source
 ```
 
 PowerShell:
 
 ```powershell
-iwr https://raw.githubusercontent.com/laeioun/cue/main/scripts/init.ps1 -OutFile "$HOME\Documents\cue-init.ps1"
-. "$HOME\Documents\cue-init.ps1"
+Invoke-Expression (& { (cue init powershell | Out-String) })
 ```
 
 For local development:
 
 ```bash
-go build -o cue ./cmd/cue
+go build -o cue .
 mkdir -p ~/.local/bin
 cp cue ~/.local/bin/
-source scripts/init.bash
+eval "$(cue init bash)"
 ```
 
 ## Supported Shells
 
 - bash
+- fish
 - zsh
 - PowerShell with PSReadLine
 
