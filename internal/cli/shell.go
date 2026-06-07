@@ -82,21 +82,25 @@ func initCmd() *cobra.Command {
 
 func installCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "install",
+		Use:   "install [shell]",
 		Short: "Install shell integration automatically",
-		Args:  cobra.NoArgs,
+		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return installShellIntegration(cmd)
+			return installShellIntegration(cmd, args)
 		},
 	}
 }
 
-func installShellIntegration(cmd *cobra.Command) error {
-	shellEnv := os.Getenv("SHELL")
-	if strings.TrimSpace(shellEnv) == "" {
-		return errors.New("could not detect shell from $SHELL; run cue init <shell> manually")
+func installShellIntegration(cmd *cobra.Command, args []string) error {
+	shell := ""
+	if len(args) > 0 {
+		shell = normalizeShell(args[0])
+	} else {
+		shell = detectShell()
 	}
-	shell := normalizeShell(shellEnv)
+	if strings.TrimSpace(shell) == "" {
+		return errors.New("could not detect shell; run cue install <shell> or cue init <shell> manually")
+	}
 	if _, ok := hookScripts[shell]; !ok {
 		return fmt.Errorf("unsupported shell %q (supported: %s)", shell, strings.Join(supportedShells(), ", "))
 	}
@@ -130,6 +134,17 @@ func installShellIntegration(cmd *cobra.Command) error {
 	}
 	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Added to %s - restart your shell or run: %s\n", rcFile, reloadCommand(shell, rcFile))
 	return err
+}
+
+func detectShell() string {
+	shellEnv := os.Getenv("SHELL")
+	if strings.TrimSpace(shellEnv) != "" {
+		return normalizeShell(shellEnv)
+	}
+	if runtime.GOOS == "windows" {
+		return "powershell"
+	}
+	return ""
 }
 
 func normalizeShell(shell string) string {

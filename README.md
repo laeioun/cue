@@ -24,7 +24,7 @@ irm https://raw.githubusercontent.com/laeioun/cue/main/install.ps1 | iex
 ```
 
 The installer downloads the latest GitHub Release for your platform, places `cue`
-on your user PATH, and runs `cue install` to add the shell hook.
+on your user PATH, and adds the shell hook.
 
 ### Manual Shell Setup
 
@@ -32,6 +32,12 @@ If you already have the binary installed, run:
 
 ```bash
 cue install
+```
+
+On PowerShell, you can also install the hook explicitly:
+
+```powershell
+cue install powershell
 ```
 
 Or add one line manually:

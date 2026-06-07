@@ -26,5 +26,14 @@ if (($userPath -split ";") -notcontains $installDir) {
     [Environment]::SetEnvironmentVariable("Path", "$userPath;$installDir", "User")
 }
 
-& $dest install
+$profilePath = $PROFILE.CurrentUserCurrentHost
+New-Item -ItemType Directory -Force (Split-Path $profilePath) | Out-Null
+$profileContent = if (Test-Path $profilePath) { Get-Content $profilePath -Raw } else { "" }
+$installLine = 'Invoke-Expression (& { (cue init powershell | Out-String) })'
+
+if ($profileContent -notlike "*cue init powershell*") {
+    Add-Content -Path $profilePath -Value "`n$installLine"
+}
+
+Invoke-Expression (& { (& $dest init powershell | Out-String) })
 Write-Host "cue $version installed - restart your terminal"

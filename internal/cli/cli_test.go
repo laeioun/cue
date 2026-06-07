@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"testing/fstest"
@@ -64,6 +65,44 @@ func TestInstallAddsShellHookOnce(t *testing.T) {
 	}
 	if got := strings.Count(string(content), "cue init zsh"); got != 1 {
 		t.Fatalf("cue init zsh count after second install = %d, want 1", got)
+	}
+}
+
+func TestInstallAcceptsExplicitPowerShell(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("SHELL", "")
+
+	output, err := executeCommand(New(fstest.MapFS{}), "install", "pwsh")
+	if err != nil {
+		t.Fatalf("install pwsh failed: %v", err)
+	}
+	if !strings.Contains(output, "Added to") {
+		t.Fatalf("install output = %q, want added message", output)
+	}
+
+	profile := powershellProfile(home)
+	content, err := os.ReadFile(profile)
+	if err != nil {
+		t.Fatalf("read PowerShell profile: %v", err)
+	}
+	if !strings.Contains(string(content), "cue init powershell") {
+		t.Fatalf("profile = %q, want PowerShell hook", content)
+	}
+}
+
+func TestDetectShellReturnsPowerShellOnWindowsWithoutShell(t *testing.T) {
+	t.Setenv("SHELL", "")
+
+	if runtime.GOOS == "windows" {
+		if got := detectShell(); got != "powershell" {
+			t.Fatalf("detectShell() = %q, want powershell", got)
+		}
+		return
+	}
+
+	if got := detectShell(); got != "" {
+		t.Fatalf("detectShell() = %q, want empty shell", got)
 	}
 }
 
