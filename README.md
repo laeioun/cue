@@ -11,11 +11,24 @@ $ git com<Tab>
 
 ## Install
 
+Install the latest pre-built binary and shell integration:
+
 ```bash
-go install github.com/laeioun/cue@latest
+curl -fsSL https://raw.githubusercontent.com/laeioun/cue/main/install.sh | sh
 ```
 
-Then source the integration for your shell:
+Windows PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/laeioun/cue/main/install.ps1 | iex
+```
+
+The installer downloads the latest GitHub Release for your platform, places `cue`
+on your user PATH, and runs `cue install` to add the shell hook.
+
+### Manual Shell Setup
+
+If you already have the binary installed, run:
 
 ```bash
 cue install
@@ -38,6 +51,12 @@ PowerShell:
 
 ```powershell
 Invoke-Expression (& { (cue init powershell | Out-String) })
+```
+
+### From Source
+
+```bash
+go install github.com/laeioun/cue@latest
 ```
 
 For local development:
