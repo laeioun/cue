@@ -67,6 +67,38 @@ func TestInstallAddsShellHookOnce(t *testing.T) {
 	}
 }
 
+func TestSpecGenerateWritesUserSpec(t *testing.T) {
+	binDir := t.TempDir()
+	writeExecutable(t, filepath.Join(binDir, "draftcmd"), `#!/bin/sh
+cat <<'EOF'
+Commands:
+  deploy    Deploy the app
+  logs      Show logs
+EOF
+`)
+	t.Setenv("PATH", binDir+string(os.PathListSeparator)+os.Getenv("PATH"))
+
+	configDir := t.TempDir()
+	t.Setenv("XDG_CONFIG_HOME", configDir)
+
+	output, err := executeCommand(New(fstest.MapFS{}), "spec", "generate", "draftcmd")
+	if err != nil {
+		t.Fatalf("spec generate failed: %v", err)
+	}
+	if !strings.Contains(output, "Wrote") {
+		t.Fatalf("spec generate output = %q, want written path", output)
+	}
+
+	specPath := filepath.Join(configDir, "cue", "specs", "draftcmd.yaml")
+	content, err := os.ReadFile(specPath)
+	if err != nil {
+		t.Fatalf("read generated spec: %v", err)
+	}
+	if !strings.Contains(string(content), "name: deploy") || !strings.Contains(string(content), "description: Deploy the app") {
+		t.Fatalf("generated spec = %q, want parsed deploy command", content)
+	}
+}
+
 func executeCommand(cmd *cobra.Command, args ...string) (string, error) {
 	var output bytes.Buffer
 	cmd.SetArgs(args)
@@ -74,4 +106,11 @@ func executeCommand(cmd *cobra.Command, args ...string) (string, error) {
 	cmd.SetErr(&output)
 	err := cmd.Execute()
 	return output.String(), err
+}
+
+func writeExecutable(t *testing.T, path, content string) {
+	t.Helper()
+	if err := os.WriteFile(path, []byte(content), 0o755); err != nil {
+		t.Fatalf("write executable: %v", err)
+	}
 }

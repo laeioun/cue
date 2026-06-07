@@ -1,0 +1,147 @@
+name: docker
+description: Docker CLI
+subcommands:
+  - name: attach
+    description: Attach local streams to a running container
+    flags: [--detach-keys, --no-stdin, --sig-proxy]
+  - name: build
+    description: Build an image from a Dockerfile
+    flags: [--tag, -t, --file, -f, --build-arg, --target, --pull, --no-cache, --platform, --progress, --quiet, -q]
+  - name: builder
+    description: Manage builds
+    subcommands:
+      - { name: build, description: Build from a Dockerfile }
+      - { name: prune, description: Remove build cache }
+  - name: compose
+    description: Define and run multi-container applications
+    subcommands:
+      - { name: build, description: Build or rebuild services }
+      - { name: config, description: Parse and render compose file }
+      - { name: cp, description: Copy files between a service container and local filesystem }
+      - { name: down, description: Stop and remove containers, networks, images, and volumes }
+      - { name: exec, description: Execute a command in a running container }
+      - { name: logs, description: View output from containers }
+      - { name: ps, description: List containers }
+      - { name: pull, description: Pull service images }
+      - { name: restart, description: Restart service containers }
+      - { name: run, description: Run a one-off command on a service }
+      - { name: start, description: Start services }
+      - { name: stop, description: Stop services }
+      - { name: up, description: Create and start containers }
+    flags: [--file, -f, --project-name, -p, --profile, --env-file, --ansi, --progress]
+  - name: container
+    description: Manage containers
+    subcommands:
+      - { name: attach, description: Attach local streams to a running container }
+      - { name: commit, description: Create a new image from a container }
+      - { name: cp, description: Copy files between a container and local filesystem }
+      - { name: create, description: Create a new container }
+      - { name: exec, description: Execute a command in a running container }
+      - { name: inspect, description: Display detailed information on containers }
+      - { name: kill, description: Kill one or more running containers }
+      - { name: logs, description: Fetch container logs }
+      - { name: ls, description: List containers }
+      - { name: prune, description: Remove stopped containers }
+      - { name: rename, description: Rename a container }
+      - { name: restart, description: Restart containers }
+      - { name: rm, description: Remove containers }
+      - { name: run, description: Create and run a new container }
+      - { name: start, description: Start containers }
+      - { name: stats, description: Display live container resource usage }
+      - { name: stop, description: Stop containers }
+      - { name: top, description: Display running processes of a container }
+    flags: [--help]
+  - name: cp
+    description: Copy files between a container and local filesystem
+    flags: [--archive, -a, --follow-link, -L, --quiet, -q]
+  - name: create
+    description: Create a new container
+    flags: [--name, --detach, -d, --env, -e, --env-file, --publish, -p, --volume, -v, --workdir, -w, --network, --platform, --pull]
+  - name: exec
+    description: Execute a command in a running container
+    flags: [--detach, -d, --env, -e, --interactive, -i, --tty, -t, --user, -u, --workdir, -w]
+  - name: image
+    description: Manage images
+    subcommands:
+      - { name: build, description: Build an image from a Dockerfile }
+      - { name: history, description: Show image history }
+      - { name: import, description: Import contents from a tarball }
+      - { name: inspect, description: Display detailed image information }
+      - { name: load, description: Load an image from a tar archive }
+      - { name: ls, description: List images }
+      - { name: prune, description: Remove unused images }
+      - { name: pull, description: Download an image from a registry }
+      - { name: push, description: Upload an image to a registry }
+      - { name: rm, description: Remove images }
+      - { name: save, description: Save images to a tar archive }
+      - { name: tag, description: Create a tag for an image }
+    flags: [--help]
+  - name: images
+    description: List images
+    flags: [--all, -a, --digests, --filter, -f, --format, --no-trunc, --quiet, -q]
+  - name: inspect
+    description: Return low-level information on Docker objects
+    flags: [--format, -f, --size, -s, --type]
+  - name: login
+    description: Log in to a registry
+    flags: [--username, -u, --password, -p, --password-stdin]
+  - name: logs
+    description: Fetch container logs
+    flags: [--follow, -f, --tail, -n, --timestamps, -t, --since, --until, --details]
+  - name: network
+    description: Manage networks
+    subcommands:
+      - { name: connect, description: Connect a container to a network }
+      - { name: create, description: Create a network }
+      - { name: disconnect, description: Disconnect a container from a network }
+      - { name: inspect, description: Display detailed network information }
+      - { name: ls, description: List networks }
+      - { name: prune, description: Remove unused networks }
+      - { name: rm, description: Remove networks }
+    flags: [--help]
+  - name: ps
+    description: List containers
+    flags: [--all, -a, --filter, -f, --format, --last, -n, --latest, -l, --no-trunc, --quiet, -q, --size, -s]
+  - name: pull
+    description: Download an image from a registry
+    flags: [--all-tags, -a, --platform, --quiet, -q]
+  - name: push
+    description: Upload an image to a registry
+    flags: [--all-tags, -a, --disable-content-trust, --quiet, -q]
+  - name: restart
+    description: Restart containers
+    flags: [--signal, -s, --time, -t]
+  - name: rm
+    description: Remove containers
+    flags: [--force, -f, --link, -l, --volumes, -v]
+  - name: rmi
+    description: Remove images
+    flags: [--force, -f, --no-prune]
+  - name: run
+    description: Create and run a new container
+    flags: [--detach, -d, --name, --env, -e, --env-file, --interactive, -i, --tty, -t, --publish, -p, --publish-all, -P, --volume, -v, --workdir, -w, --rm, --network, --platform, --pull, --user, -u]
+  - name: start
+    description: Start containers
+    flags: [--attach, -a, --detach-keys, --interactive, -i]
+  - name: stop
+    description: Stop containers
+    flags: [--signal, -s, --time, -t]
+  - name: system
+    description: Manage Docker
+    subcommands:
+      - { name: df, description: Show Docker disk usage }
+      - { name: events, description: Get real time events from the server }
+      - { name: info, description: Display system-wide information }
+      - { name: prune, description: Remove unused data }
+    flags: [--help]
+  - name: tag
+    description: Create a tag for an image
+  - name: volume
+    description: Manage volumes
+    subcommands:
+      - { name: create, description: Create a volume }
+      - { name: inspect, description: Display detailed volume information }
+      - { name: ls, description: List volumes }
+      - { name: prune, description: Remove unused local volumes }
+      - { name: rm, description: Remove volumes }
+    flags: [--help]

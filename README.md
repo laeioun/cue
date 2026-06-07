@@ -1,13 +1,13 @@
 # cue
 
-Minimal Tab autocomplete for `git`, `gh`, and any CLI with parseable `--help` output.
+Minimal Tab autocomplete that hooks into your shell's normal Tab key. No session wrapper, no `is` prefix, no new shell mode.
 
 ```text
 $ git com<Tab>
   commit    Record changes to the repository
 ```
 
-`cue` installs a shell Tab hook. When you press Tab, the hook calls `cue complete "<buffer>" <cursor>`, shows a Bubble Tea picker on the terminal, and writes the selected completion back into your shell buffer.
+`cue` installs a shell Tab hook. When you press Tab, the hook calls `cue complete "<buffer>" <cursor>`, expands aliases, fast-accepts clear matches, shows a Bubble Tea picker when needed, and writes the selected completion back into your shell buffer.
 
 ## Install
 
@@ -58,13 +58,22 @@ eval "$(cue init bash)"
 
 ## Supported Commands
 
-- `git` from the bundled YAML spec
-- `gh` from the bundled YAML spec
+- `git`, `gh`, `cargo`, and `docker` from bundled YAML specs
+- User specs from `~/.config/cue/specs/<command>.yaml`
 - Other commands through a best-effort `--help`, `-h`, then `help` fallback parser
 
 Fallback completions are cached under your user cache directory, usually `~/.cache/cue`.
 
 ## Adding A Spec
+
+Generate a draft spec from any command with parseable help:
+
+```bash
+cue spec generate cargo
+cue spec generate myapp
+```
+
+Generated specs are written to `~/.config/cue/specs/<command>.yaml`, where you can edit them by hand. Use `--force` to replace an existing generated spec.
 
 Specs live in `specs/` and use recursive YAML nodes:
 

@@ -1,6 +1,8 @@
 package completion
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 	"testing/fstest"
 )
@@ -25,6 +27,30 @@ subcommands:
 	}
 	if len(got) != 1 || got[0].Name != "commit" {
 		t.Fatalf("Complete() = %v, want commit", got)
+	}
+}
+
+func TestCompleteFallsBackWhenEmbeddedSpecIsEmpty(t *testing.T) {
+	binDir := t.TempDir()
+	writeExecutable(t, filepath.Join(binDir, "emptycmd"), `#!/bin/sh
+cat <<'EOF'
+Commands:
+  build    Build the project
+EOF
+`)
+	t.Setenv("PATH", binDir+string(os.PathListSeparator)+os.Getenv("PATH"))
+	t.Setenv("XDG_CACHE_HOME", t.TempDir())
+
+	specs := fstest.MapFS{
+		"emptycmd.yaml": {Data: []byte("")},
+	}
+
+	got, err := Complete(specs, "emptycmd bu", 11)
+	if err != nil {
+		t.Fatalf("Complete() error = %v", err)
+	}
+	if len(got) != 1 || got[0].Name != "build" {
+		t.Fatalf("Complete() = %v, want build from help fallback", got)
 	}
 }
 

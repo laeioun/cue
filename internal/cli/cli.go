@@ -68,5 +68,6 @@ func New(specs fs.FS) *cobra.Command {
 	rootCmd.AddCommand(completeCmd)
 	rootCmd.AddCommand(initCmd())
 	rootCmd.AddCommand(installCmd())
+	rootCmd.AddCommand(specCmd())
 	return rootCmd
 }

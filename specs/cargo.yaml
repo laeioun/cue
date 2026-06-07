@@ -1,0 +1,66 @@
+name: cargo
+description: Rust package manager
+subcommands:
+  - name: add
+    description: Add dependencies to Cargo.toml
+    flags: [--dev, --build, --optional, --features, --no-default-features, --package, -p]
+  - name: bench
+    description: Run benchmarks
+    flags: [--bench, --all, --package, -p, --features, --release, --no-default-features]
+  - name: build
+    description: Compile the current package
+    flags: [--release, -r, --package, -p, --workspace, --all-targets, --target, --features, --no-default-features, --verbose, -v, --quiet, -q]
+  - name: check
+    description: Check a package without producing artifacts
+    flags: [--package, -p, --workspace, --all-targets, --target, --features, --no-default-features, --verbose, -v, --quiet, -q]
+  - name: clean
+    description: Remove build artifacts
+    flags: [--package, -p, --release, --target, --doc]
+  - name: clippy
+    description: Run Clippy lints
+    flags: [--fix, --package, -p, --workspace, --all-targets, --target, --features, --no-default-features, --release]
+  - name: doc
+    description: Build package documentation
+    flags: [--open, --no-deps, --document-private-items, --package, -p, --workspace, --features, --no-default-features]
+  - name: fetch
+    description: Fetch dependencies
+    flags: [--target, --verbose, -v, --quiet, -q]
+  - name: fmt
+    description: Format Rust packages
+    flags: [--all, --package, -p, --check]
+  - name: init
+    description: Create a new Cargo package in an existing directory
+    flags: [--bin, --lib, --name, --vcs, --edition]
+  - name: install
+    description: Install a Rust binary
+    flags: [--version, --git, --branch, --tag, --rev, --path, --root, --force, -f, --locked, --features, --no-default-features]
+  - name: login
+    description: Save a crates.io API token
+    flags: [--registry]
+  - name: metadata
+    description: Output package metadata as JSON
+    flags: [--format-version, --no-deps, --features, --no-default-features, --filter-platform]
+  - name: new
+    description: Create a new Cargo package
+    flags: [--bin, --lib, --name, --vcs, --edition]
+  - name: publish
+    description: Upload a package to a registry
+    flags: [--dry-run, --registry, --token, --allow-dirty, --package, -p, --features, --no-default-features]
+  - name: remove
+    description: Remove dependencies from Cargo.toml
+    flags: [--dev, --build, --package, -p]
+  - name: run
+    description: Run a binary or example
+    flags: [--release, -r, --bin, --example, --package, -p, --features, --no-default-features, --target, --verbose, -v, --quiet, -q]
+  - name: search
+    description: Search packages in registries
+    flags: [--limit, --registry]
+  - name: test
+    description: Run tests
+    flags: [--release, -r, --lib, --bin, --example, --test, --bench, --doc, --all-targets, --package, -p, --workspace, --features, --no-default-features, --no-fail-fast]
+  - name: tree
+    description: Display a dependency tree
+    flags: [--package, -p, --workspace, --features, --no-default-features, --duplicates, -d, --invert, -i, --depth]
+  - name: update
+    description: Update dependencies in Cargo.lock
+    flags: [--package, -p, --workspace, --aggressive, --dry-run]
