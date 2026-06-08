@@ -19,6 +19,16 @@ var hookScripts = map[string]string{
     if [ $? -eq 0 ] && [ -n "$result" ]; then
         READLINE_LINE="$result"
         READLINE_POINT="${#result}"
+    else
+        local word="${READLINE_LINE:0:$READLINE_POINT}"
+        word="${word##* }"
+        local matches
+        mapfile -t matches < <(compgen -f -- "$word" 2>/dev/null)
+        if [ "${#matches[@]}" -eq 1 ]; then
+            local prefix="${READLINE_LINE:0:$((READLINE_POINT - ${#word}))}"
+            READLINE_LINE="${prefix}${matches[0]}"
+            READLINE_POINT="${#READLINE_LINE}"
+        fi
     fi
 }
 
@@ -45,6 +55,8 @@ bind \t _cue_complete
     if ($LASTEXITCODE -eq 0 -and $result) {
         [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $line.Length, $result)
         [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($result.Length)
+    } else {
+        [Microsoft.PowerShell.PSConsoleReadLine]::TabCompleteNext()
     }
 }
 `,
@@ -54,8 +66,10 @@ bind \t _cue_complete
     if [ $? -eq 0 ] && [ -n "$result" ]; then
         BUFFER="$result"
         CURSOR="${#BUFFER}"
+        zle reset-prompt
+    else
+        zle expand-or-complete
     fi
-    zle reset-prompt
 }
 
 zle -N _cue_complete
