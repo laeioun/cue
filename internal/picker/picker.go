@@ -2,6 +2,7 @@ package picker
 
 import (
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -20,20 +21,38 @@ func Run(completions []completion.Completion) (string, error) {
 		return "", nil
 	}
 
-	tty, err := openTTY()
-	if err != nil {
-		return "", err
+	var in, out *os.File
+	if runtime.GOOS == "windows" {
+		var err error
+		in, err = os.OpenFile("CONIN$", os.O_RDWR, 0)
+		if err != nil {
+			return "", nil
+		}
+		out, err = os.OpenFile("CONOUT$", os.O_RDWR, 0)
+		if err != nil {
+			in.Close()
+			return "", nil
+		}
+		defer in.Close()
+		defer out.Close()
+	} else {
+		tty, err := os.OpenFile("/dev/tty", os.O_RDWR, 0)
+		if err != nil {
+			return "", nil
+		}
+		defer tty.Close()
+		in = tty
+		out = tty
 	}
-	defer tty.Close()
 
-	oldState, err := term.MakeRaw(int(tty.Fd()))
+	oldState, err := term.MakeRaw(int(in.Fd()))
 	if err != nil {
 		return "", err
 	}
-	defer term.Restore(int(tty.Fd()), oldState)
+	defer term.Restore(int(in.Fd()), oldState)
 
 	p := inlinePicker{
-		tty:         tty,
+		out:         out,
 		completions: completions,
 	}
 	if err := p.render(); err != nil {
@@ -42,7 +61,7 @@ func Run(completions []completion.Completion) (string, error) {
 	defer p.clear()
 
 	for {
-		key, err := readKey(tty)
+		key, err := readKey(in)
 		if err != nil {
 			return "", err
 		}
@@ -70,7 +89,7 @@ func Run(completions []completion.Completion) (string, error) {
 }
 
 type inlinePicker struct {
-	tty         *os.File
+	out         *os.File
 	completions []completion.Completion
 	selected    int
 	offset      int
@@ -78,7 +97,7 @@ type inlinePicker struct {
 
 func (p *inlinePicker) render() error {
 	p.ensureVisible()
-	width, _, err := term.GetSize(int(p.tty.Fd()))
+	width, _, err := term.GetSize(int(p.out.Fd()))
 	if err != nil || width <= 0 {
 		width = 80
 	}
@@ -103,7 +122,7 @@ func (p *inlinePicker) render() error {
 	}
 	b.WriteString("\x1b[u\x1b[?25h")
 
-	_, err = p.tty.WriteString(b.String())
+	_, err = p.out.WriteString(b.String())
 	return err
 }
 
@@ -117,7 +136,7 @@ func (p *inlinePicker) clear() {
 		}
 	}
 	b.WriteString("\x1b[u\x1b[?25h")
-	_, _ = p.tty.WriteString(b.String())
+	_, _ = p.out.WriteString(b.String())
 }
 
 func (p *inlinePicker) ensureVisible() {
@@ -151,17 +170,6 @@ func padRight(value string, width int) string {
 		return value
 	}
 	return value + strings.Repeat(" ", width-len(value))
-}
-
-func openTTY() (*os.File, error) {
-	tty, err := os.OpenFile("/dev/tty", os.O_RDWR, 0)
-	if err == nil {
-		return tty, nil
-	}
-	if tty, err = os.OpenFile("CONIN$", os.O_RDWR, 0); err == nil {
-		return tty, nil
-	}
-	return os.OpenFile("CONOUT$", os.O_RDWR, 0)
 }
 
 type key int
