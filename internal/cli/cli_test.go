@@ -27,6 +27,9 @@ func TestInitPrintsShellHook(t *testing.T) {
 	if !strings.Contains(output, `bindkey '\t' _cue_complete`) {
 		t.Fatalf("init zsh output = %q, want zsh hook", output)
 	}
+	if !strings.Contains(output, cursorResponsePrefix) {
+		t.Fatalf("init zsh output = %q, want cursor response support", output)
+	}
 }
 
 func TestInstallAddsShellHookOnce(t *testing.T) {
@@ -135,6 +138,43 @@ EOF
 	}
 	if !strings.Contains(string(content), "name: deploy") || !strings.Contains(string(content), "description: Deploy the app") {
 		t.Fatalf("generated spec = %q, want parsed deploy command", content)
+	}
+}
+
+func TestVimCommandTogglesConfig(t *testing.T) {
+	configDir := t.TempDir()
+	t.Setenv("XDG_CONFIG_HOME", configDir)
+
+	output, err := executeCommand(New(fstest.MapFS{}), "vim")
+	if err != nil {
+		t.Fatalf("vim status failed: %v", err)
+	}
+	if !strings.Contains(output, "vim mode off") {
+		t.Fatalf("vim status output = %q, want off", output)
+	}
+
+	output, err = executeCommand(New(fstest.MapFS{}), "vim", "on")
+	if err != nil {
+		t.Fatalf("vim on failed: %v", err)
+	}
+	if !strings.Contains(output, "vim mode on") {
+		t.Fatalf("vim on output = %q, want on", output)
+	}
+
+	content, err := os.ReadFile(filepath.Join(configDir, "cue", "config.yaml"))
+	if err != nil {
+		t.Fatalf("read config: %v", err)
+	}
+	if !strings.Contains(string(content), "vim_mode: true") {
+		t.Fatalf("config = %q, want vim_mode true", content)
+	}
+
+	output, err = executeCommand(New(fstest.MapFS{}), "vim", "toggle")
+	if err != nil {
+		t.Fatalf("vim toggle failed: %v", err)
+	}
+	if !strings.Contains(output, "vim mode off") {
+		t.Fatalf("vim toggle output = %q, want off", output)
 	}
 }
 

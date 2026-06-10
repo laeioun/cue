@@ -9,8 +9,11 @@ import (
 
 	"github.com/laeioun/cue/internal/aliases"
 	"github.com/laeioun/cue/internal/completion"
+	"github.com/laeioun/cue/internal/config"
 	"github.com/laeioun/cue/internal/picker"
 )
+
+const cursorResponsePrefix = "__cue_cursor__:"
 
 func Execute(specs fs.FS) error {
 	return New(specs).Execute()
@@ -54,12 +57,26 @@ func New(specs fs.FS) *cobra.Command {
 				return nil
 			}
 
-			selected, err := picker.Run(completions)
+			cfg, _ := config.Load()
+			result, err := picker.Run(completions, picker.Options{
+				Query:   partial,
+				VimMode: cfg.VimMode,
+			})
 			if err != nil {
 				return nil
 			}
-			if selected != "" {
-				fmt.Println(completion.ApplyCompletion(workingLine, workingCursor, selected))
+			switch result.Action {
+			case picker.ActionSelect:
+				fmt.Println(completion.ApplyCompletion(workingLine, workingCursor, result.Selected))
+			case picker.ActionBackspace:
+				nextLine, nextCursor := completion.DeleteBeforeCursor(workingLine, workingCursor)
+				fmt.Println(formatCursorResponse(nextLine, nextCursor))
+			case picker.ActionDelete:
+				nextLine, nextCursor := completion.DeleteAtCursor(workingLine, workingCursor)
+				fmt.Println(formatCursorResponse(nextLine, nextCursor))
+			case picker.ActionInsert:
+				nextLine, nextCursor := completion.InsertAtCursor(workingLine, workingCursor, result.Text)
+				fmt.Println(formatCursorResponse(nextLine, nextCursor))
 			}
 			return nil
 		},
@@ -69,5 +86,10 @@ func New(specs fs.FS) *cobra.Command {
 	rootCmd.AddCommand(initCmd())
 	rootCmd.AddCommand(installCmd())
 	rootCmd.AddCommand(specCmd())
+	rootCmd.AddCommand(vimCmd())
 	return rootCmd
+}
+
+func formatCursorResponse(line string, cursor int) string {
+	return fmt.Sprintf("%s%d:%s", cursorResponsePrefix, cursor, line)
 }

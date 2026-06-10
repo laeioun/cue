@@ -15,8 +15,8 @@ import (
 )
 
 var (
-	helpLineRE          = regexp.MustCompile(`^\s{2,}([a-z][\w-]+)\s{2,}(.+)$`)
-	helpSectionHeaderRE = regexp.MustCompile(`(?i)^\s*(available commands|subcommands|commands):\s*$`)
+	helpLineRE          = regexp.MustCompile(`^\s+([a-z][\w-]+)\s+(.+)$`)
+	helpSectionHeaderRE = regexp.MustCompile(`(?i)^\s*(available commands|subcommands|commands|the commands are):\s*$`)
 	sectionHeaderRE     = regexp.MustCompile(`^\s*[A-Za-z][A-Za-z ]+:\s*$`)
 )
 

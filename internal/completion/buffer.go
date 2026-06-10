@@ -38,6 +38,27 @@ func ApplyCompletion(line string, cursor int, selected string) string {
 	return line[:start] + selected + line[end:]
 }
 
+func DeleteBeforeCursor(line string, cursor int) (string, int) {
+	cursor = clampCursor(line, cursor)
+	if cursor == 0 {
+		return line, cursor
+	}
+	return line[:cursor-1] + line[cursor:], cursor - 1
+}
+
+func DeleteAtCursor(line string, cursor int) (string, int) {
+	cursor = clampCursor(line, cursor)
+	if cursor >= len(line) {
+		return line, cursor
+	}
+	return line[:cursor] + line[cursor+1:], cursor
+}
+
+func InsertAtCursor(line string, cursor int, text string) (string, int) {
+	cursor = clampCursor(line, cursor)
+	return line[:cursor] + text + line[cursor:], cursor + len(text)
+}
+
 func clampCursor(line string, cursor int) int {
 	if cursor < 0 {
 		return 0

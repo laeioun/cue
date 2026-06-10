@@ -30,6 +30,28 @@ subcommands:
 	}
 }
 
+func TestCompleteUsesFuzzyFiltering(t *testing.T) {
+	specs := fstest.MapFS{
+		"git.yaml": {
+			Data: []byte(`name: git
+subcommands:
+  - name: commit
+    description: Record changes
+  - name: checkout
+    description: Switch branches
+`),
+		},
+	}
+
+	got, err := Complete(specs, "git cm", 6)
+	if err != nil {
+		t.Fatalf("Complete() error = %v", err)
+	}
+	if len(got) != 1 || got[0].Name != "commit" {
+		t.Fatalf("Complete() = %v, want fuzzy commit match", got)
+	}
+}
+
 func TestCompleteFallsBackWhenEmbeddedSpecIsEmpty(t *testing.T) {
 	binDir := t.TempDir()
 	writeExecutable(t, filepath.Join(binDir, "emptycmd"), `#!/bin/sh
@@ -102,5 +124,17 @@ func TestFastSelectionRejectsAmbiguousShortPrefix(t *testing.T) {
 	}, "co")
 	if ok || got != "" {
 		t.Fatalf("FastSelection() = %q, %v; want empty, false", got, ok)
+	}
+}
+
+func TestFilterRanksPrefixBeforeFuzzyMatch(t *testing.T) {
+	got := Filter([]Completion{
+		{Name: "remote-add"},
+		{Name: "rebase"},
+		{Name: "read-tree"},
+	}, "rea")
+
+	if len(got) != 3 || got[0].Name != "read-tree" {
+		t.Fatalf("Filter() = %v, want prefix match first", got)
 	}
 }

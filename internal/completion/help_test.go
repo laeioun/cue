@@ -65,6 +65,27 @@ Commands:
 			wantDesc:  []string{"Builds or changes infrastructure", "Show changes required"},
 		},
 		{
+			name: "go help commands",
+			output: `Go is a tool for managing Go source code.
+
+Usage:
+
+	go command [arguments]
+
+The commands are:
+
+	bug         start a bug report
+	build       compile packages and dependencies
+	env         print Go environment information
+
+Additional help topics:
+
+	buildconstraint build constraints
+`,
+			wantNames: []string{"bug", "build", "env"},
+			wantDesc:  []string{"start a bug report", "compile packages and dependencies", "print Go environment information"},
+		},
+		{
 			name: "section suppresses unrelated global matches",
 			output: `Usage:
   myapp <command>

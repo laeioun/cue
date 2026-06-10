@@ -17,8 +17,14 @@ var hookScripts = map[string]string{
     local result
     result=$(cue complete "$READLINE_LINE" "$READLINE_POINT" 2>/dev/null)
     if [ $? -eq 0 ] && [ -n "$result" ]; then
-        READLINE_LINE="$result"
-        READLINE_POINT="${#result}"
+        if [[ "$result" == __cue_cursor__:* ]]; then
+            local payload="${result#__cue_cursor__:}"
+            READLINE_POINT="${payload%%:*}"
+            READLINE_LINE="${payload#*:}"
+        else
+            READLINE_LINE="$result"
+            READLINE_POINT="${#result}"
+        fi
     else
         local word="${READLINE_LINE:0:$READLINE_POINT}"
         word="${word##* }"
@@ -40,8 +46,15 @@ bind -x '"\t": _cue_complete'
     set -l result (cue complete "$buffer" "$cursor" 2>/dev/null)
     set -l exit_status $status
     if test $exit_status -eq 0; and test -n "$result"
-        commandline -r "$result"
-        commandline -C (string length "$result")
+        if string match -q "__cue_cursor__:*" -- "$result"
+            set -l payload (string replace -r "^__cue_cursor__:" "" -- "$result")
+            set -l parts (string split -m 1 ":" -- "$payload")
+            commandline -r "$parts[2]"
+            commandline -C "$parts[1]"
+        else
+            commandline -r "$result"
+            commandline -C (string length "$result")
+        end
     end
 end
 
@@ -53,8 +66,20 @@ bind \t _cue_complete
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
     $result = & cue complete $line $cursor 2>$null
     if ($LASTEXITCODE -eq 0 -and $result) {
-        [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $line.Length, $result)
-        [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($result.Length)
+        $prefix = "__cue_cursor__:"
+        if ($result.StartsWith($prefix)) {
+            $payload = $result.Substring($prefix.Length)
+            $separator = $payload.IndexOf(":")
+            if ($separator -ge 0) {
+                $nextCursor = [int]$payload.Substring(0, $separator)
+                $nextLine = $payload.Substring($separator + 1)
+                [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $line.Length, $nextLine)
+                [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($nextCursor)
+            }
+        } else {
+            [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $line.Length, $result)
+            [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($result.Length)
+        }
     } else {
         [Microsoft.PowerShell.PSConsoleReadLine]::TabCompleteNext()
     }
@@ -64,8 +89,14 @@ bind \t _cue_complete
     local result
     result=$(cue complete "$BUFFER" "$CURSOR" 2>/dev/null)
     if [ $? -eq 0 ] && [ -n "$result" ]; then
-        BUFFER="$result"
-        CURSOR="${#BUFFER}"
+        if [[ "$result" == __cue_cursor__:* ]]; then
+            local payload="${result#__cue_cursor__:}"
+            CURSOR="${payload%%:*}"
+            BUFFER="${payload#*:}"
+        else
+            BUFFER="$result"
+            CURSOR="${#BUFFER}"
+        fi
         zle reset-prompt
     else
         zle expand-or-complete
