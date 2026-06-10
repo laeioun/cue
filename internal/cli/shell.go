@@ -161,7 +161,7 @@ func installShellIntegration(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if strings.Contains(string(content), "cue init") {
-		_, err := fmt.Fprintf(cmd.OutOrStdout(), "cue integration already present in %s\n", rcFile)
+		_, err := fmt.Fprintf(cmd.OutOrStdout(), "cue integration already present in %s - reload your shell or run: %s\n", rcFile, reloadCommand(shell, rcFile))
 		return err
 	}
 

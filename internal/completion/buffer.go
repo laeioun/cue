@@ -59,6 +59,65 @@ func InsertAtCursor(line string, cursor int, text string) (string, int) {
 	return line[:cursor] + text + line[cursor:], cursor + len(text)
 }
 
+func MoveCursorLeft(line string, cursor int) int {
+	cursor = clampCursor(line, cursor)
+	if cursor == 0 {
+		return cursor
+	}
+	return cursor - 1
+}
+
+func MoveCursorRight(line string, cursor int) int {
+	cursor = clampCursor(line, cursor)
+	if cursor >= len(line) {
+		return cursor
+	}
+	return cursor + 1
+}
+
+func MoveCursorWordLeft(line string, cursor int) int {
+	cursor = clampCursor(line, cursor)
+	for cursor > 0 && isSpace(line[cursor-1]) {
+		cursor--
+	}
+	for cursor > 0 && !isSpace(line[cursor-1]) {
+		cursor--
+	}
+	return cursor
+}
+
+func MoveCursorWordRight(line string, cursor int) int {
+	cursor = clampCursor(line, cursor)
+	for cursor < len(line) && !isSpace(line[cursor]) {
+		cursor++
+	}
+	for cursor < len(line) && isSpace(line[cursor]) {
+		cursor++
+	}
+	return cursor
+}
+
+func DeleteWordBeforeCursor(line string, cursor int) (string, int) {
+	cursor = clampCursor(line, cursor)
+	start := MoveCursorWordLeft(line, cursor)
+	return line[:start] + line[cursor:], start
+}
+
+func DeleteWordAtCursor(line string, cursor int) (string, int) {
+	cursor = clampCursor(line, cursor)
+	end := cursor
+	for end < len(line) && isSpace(line[end]) {
+		end++
+	}
+	for end < len(line) && !isSpace(line[end]) {
+		end++
+	}
+	for end < len(line) && isSpace(line[end]) {
+		end++
+	}
+	return line[:cursor] + line[end:], cursor
+}
+
 func clampCursor(line string, cursor int) int {
 	if cursor < 0 {
 		return 0

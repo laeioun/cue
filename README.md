@@ -7,7 +7,7 @@ $ git com<Tab>
   commit    Record changes to the repository
 ```
 
-`cue` installs a shell Tab hook. When you press Tab, the hook calls `cue complete "<buffer>" <cursor>`, expands aliases, fast-accepts clear matches, shows a Bubble Tea picker when needed, and writes the selected completion back into your shell buffer.
+`cue` installs a shell Tab hook. When you press Tab, the hook calls `cue complete "<buffer>" <cursor>`, expands aliases, fast-accepts clear matches, shows an inline picker when needed, and writes the selected completion back into your shell buffer.
 
 ## Install
 
@@ -80,6 +80,51 @@ eval "$(cue init bash)"
 - fish
 - zsh
 - PowerShell with PSReadLine
+
+## Usage
+
+Press `Tab` while typing a command:
+
+```text
+$ git com<Tab>
+```
+
+If there is one clear match, `cue` fills it immediately. If there are multiple matches, it opens an inline picker below the prompt. The picker starts with the word you already typed and filters matches as you keep typing.
+
+If your typed text stops matching any menu item, `cue` closes the picker and replays that text into the shell buffer so normal typing can continue. Backspace and Delete also escape the picker back into the shell edit when they would otherwise delete the original word.
+
+### Picker Keybinds
+
+Default mode:
+
+- `Down`: move down through menu items
+- `Up`: move up through menu items
+- `Tab` / `Enter`: accept the selected item
+- Type text: fuzzy-filter menu items
+- `Backspace`: edit the picker query, or close the picker and delete before the shell cursor
+- `Delete`: close the picker and delete at the shell cursor
+- `Ctrl+Backspace`: close the picker and delete the word before the shell cursor
+- `Ctrl+Delete`: close the picker and delete the word at the shell cursor
+- `Left` / `Right`: close the picker and move the shell cursor
+- `Ctrl+Left` / `Ctrl+Right`: close the picker and move the shell cursor by word
+- `Esc`: close the picker
+- `^C`: close the picker
+
+Vim mode is off by default. Toggle it with:
+
+```bash
+cue vim on
+cue vim off
+cue vim toggle
+cue vim status
+```
+
+When vim mode is on, the picker starts in normal mode:
+
+- `h` / `k`: move up
+- `j` / `l`: move down
+- `i`: enter insert mode for normal typing and fuzzy filtering
+- `Esc`: return to normal mode from insert mode; close the picker from normal mode
 
 ## Supported Commands
 

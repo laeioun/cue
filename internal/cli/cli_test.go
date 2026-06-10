@@ -61,6 +61,9 @@ func TestInstallAddsShellHookOnce(t *testing.T) {
 	if !strings.Contains(output, "already present") {
 		t.Fatalf("second install output = %q, want already present message", output)
 	}
+	if !strings.Contains(output, "source "+rcFile) {
+		t.Fatalf("second install output = %q, want reload command", output)
+	}
 
 	content, err = os.ReadFile(rcFile)
 	if err != nil {

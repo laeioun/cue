@@ -77,6 +77,20 @@ func New(specs fs.FS) *cobra.Command {
 			case picker.ActionInsert:
 				nextLine, nextCursor := completion.InsertAtCursor(workingLine, workingCursor, result.Text)
 				fmt.Println(formatCursorResponse(nextLine, nextCursor))
+			case picker.ActionDeleteWordBefore:
+				nextLine, nextCursor := completion.DeleteWordBeforeCursor(workingLine, workingCursor)
+				fmt.Println(formatCursorResponse(nextLine, nextCursor))
+			case picker.ActionDeleteWordAt:
+				nextLine, nextCursor := completion.DeleteWordAtCursor(workingLine, workingCursor)
+				fmt.Println(formatCursorResponse(nextLine, nextCursor))
+			case picker.ActionMoveLeft:
+				fmt.Println(formatCursorResponse(workingLine, completion.MoveCursorLeft(workingLine, workingCursor)))
+			case picker.ActionMoveRight:
+				fmt.Println(formatCursorResponse(workingLine, completion.MoveCursorRight(workingLine, workingCursor)))
+			case picker.ActionMoveWordLeft:
+				fmt.Println(formatCursorResponse(workingLine, completion.MoveCursorWordLeft(workingLine, workingCursor)))
+			case picker.ActionMoveWordRight:
+				fmt.Println(formatCursorResponse(workingLine, completion.MoveCursorWordRight(workingLine, workingCursor)))
 			}
 			return nil
 		},

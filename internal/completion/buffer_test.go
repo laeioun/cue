@@ -67,6 +67,38 @@ func TestInsertAtCursor(t *testing.T) {
 	}
 }
 
+func TestMoveCursor(t *testing.T) {
+	if got := MoveCursorLeft("git commit", 4); got != 3 {
+		t.Fatalf("MoveCursorLeft() = %d, want 3", got)
+	}
+	if got := MoveCursorRight("git commit", 4); got != 5 {
+		t.Fatalf("MoveCursorRight() = %d, want 5", got)
+	}
+}
+
+func TestMoveCursorWord(t *testing.T) {
+	if got := MoveCursorWordLeft("git commit --amend", 11); got != 4 {
+		t.Fatalf("MoveCursorWordLeft() = %d, want 4", got)
+	}
+	if got := MoveCursorWordRight("git commit --amend", 4); got != 11 {
+		t.Fatalf("MoveCursorWordRight() = %d, want 11", got)
+	}
+}
+
+func TestDeleteWordBeforeCursor(t *testing.T) {
+	gotLine, gotCursor := DeleteWordBeforeCursor("git commit --amend", 11)
+	if gotLine != "git --amend" || gotCursor != 4 {
+		t.Fatalf("DeleteWordBeforeCursor() = %q, %d; want git --amend, 4", gotLine, gotCursor)
+	}
+}
+
+func TestDeleteWordAtCursor(t *testing.T) {
+	gotLine, gotCursor := DeleteWordAtCursor("git commit --amend", 4)
+	if gotLine != "git --amend" || gotCursor != 4 {
+		t.Fatalf("DeleteWordAtCursor() = %q, %d; want git --amend, 4", gotLine, gotCursor)
+	}
+}
+
 func equalStrings(a, b []string) bool {
 	if len(a) != len(b) {
 		return false

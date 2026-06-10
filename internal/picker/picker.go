@@ -29,6 +29,12 @@ const (
 	ActionBackspace
 	ActionDelete
 	ActionInsert
+	ActionDeleteWordBefore
+	ActionDeleteWordAt
+	ActionMoveLeft
+	ActionMoveRight
+	ActionMoveWordLeft
+	ActionMoveWordRight
 )
 
 type Result struct {
@@ -121,6 +127,18 @@ func Run(completions []completion.Completion, opts Options) (Result, error) {
 			return Result{Action: ActionBackspace}, nil
 		case keyDelete:
 			return Result{Action: ActionDelete}, nil
+		case keyDeleteWordBefore:
+			return Result{Action: ActionDeleteWordBefore}, nil
+		case keyDeleteWordAt:
+			return Result{Action: ActionDeleteWordAt}, nil
+		case keyLeft:
+			return Result{Action: ActionMoveLeft}, nil
+		case keyRight:
+			return Result{Action: ActionMoveRight}, nil
+		case keyWordLeft:
+			return Result{Action: ActionMoveWordLeft}, nil
+		case keyWordRight:
+			return Result{Action: ActionMoveWordRight}, nil
 		case keyUp:
 			p.moveUp()
 			if err := p.render(); err != nil {
@@ -321,6 +339,12 @@ const (
 	keyDown
 	keyBackspace
 	keyDelete
+	keyDeleteWordBefore
+	keyDeleteWordAt
+	keyLeft
+	keyRight
+	keyWordLeft
+	keyWordRight
 	keyText
 )
 
@@ -349,29 +373,19 @@ func readKey(tty *os.File) (keyEvent, error) {
 		return keyEvent{key: keyCancel}, nil
 	case 0x08, 0x7f:
 		return keyEvent{key: keyBackspace}, nil
+	case 0x17:
+		return keyEvent{key: keyDeleteWordBefore}, nil
 	case 0x04:
 		return keyEvent{key: keyDelete}, nil
-	case 0x10:
-		return keyEvent{key: keyUp}, nil
-	case 0x0e:
-		return keyEvent{key: keyDown}, nil
 	case 0x1b:
 		seq := readEscapeSequence(tty)
-		if len(seq) >= 2 && seq[0] == '[' {
-			switch seq[1] {
-			case 'A':
-				return keyEvent{key: keyUp}, nil
-			case 'B':
-				return keyEvent{key: keyDown}, nil
-			case 'Z':
-				return keyEvent{key: keyUp}, nil
-			case '3':
-				if len(seq) >= 3 && seq[2] == '~' {
-					return keyEvent{key: keyDelete}, nil
-				}
-			}
+		if len(seq) == 0 {
+			return keyEvent{key: keyCancel}, nil
 		}
-		return keyEvent{key: keyCancel}, nil
+		if event, ok := parseEscapeSequence(seq); ok {
+			return event, nil
+		}
+		return keyEvent{key: keyUnknown}, nil
 	default:
 		if b[0] >= 0x20 && b[0] < 0x7f {
 			return keyEvent{key: keyText, value: b[0]}, nil
@@ -380,19 +394,104 @@ func readKey(tty *os.File) (keyEvent, error) {
 	}
 }
 
+func parseEscapeSequence(seq []byte) (keyEvent, bool) {
+	if len(seq) == 0 {
+		return keyEvent{}, false
+	}
+
+	switch seq[0] {
+	case '[':
+		csi := string(seq)
+		switch seq[len(seq)-1] {
+		case 'A':
+			return keyEvent{key: keyUp}, true
+		case 'B':
+			return keyEvent{key: keyDown}, true
+		case 'C':
+			if isModifiedArrow(csi, '5') {
+				return keyEvent{key: keyWordRight}, true
+			}
+			return keyEvent{key: keyRight}, true
+		case 'D':
+			if isModifiedArrow(csi, '5') {
+				return keyEvent{key: keyWordLeft}, true
+			}
+			return keyEvent{key: keyLeft}, true
+		case 'u':
+			return parseCSIU(csi)
+		case '~':
+			if strings.HasPrefix(csi, "[3;5") || strings.HasPrefix(csi, "[27;5;3") {
+				return keyEvent{key: keyDeleteWordAt}, true
+			}
+			if strings.HasPrefix(csi, "[3") {
+				return keyEvent{key: keyDelete}, true
+			}
+		}
+	case 'O':
+		if len(seq) < 2 {
+			return keyEvent{}, false
+		}
+		switch seq[1] {
+		case 'A':
+			return keyEvent{key: keyUp}, true
+		case 'B':
+			return keyEvent{key: keyDown}, true
+		case 'C':
+			return keyEvent{key: keyRight}, true
+		case 'D':
+			return keyEvent{key: keyLeft}, true
+		}
+	}
+	return keyEvent{}, false
+}
+
+func isModifiedArrow(csi string, modifier byte) bool {
+	if csi == "["+string(modifier)+"C" || csi == "["+string(modifier)+"D" {
+		return true
+	}
+	if len(csi) < 5 || csi[len(csi)-1] < 'A' || csi[len(csi)-1] > 'D' {
+		return false
+	}
+	return strings.Contains(csi, ";"+string(modifier))
+}
+
+func parseCSIU(csi string) (keyEvent, bool) {
+	switch csi {
+	case "[8;5u", "[127;5u":
+		return keyEvent{key: keyDeleteWordBefore}, true
+	case "[3;5u":
+		return keyEvent{key: keyDeleteWordAt}, true
+	}
+	return keyEvent{}, false
+}
+
 func readEscapeSequence(tty *os.File) []byte {
 	seq := make([]byte, 0, 8)
 	for len(seq) < cap(seq) {
-		b, ok := readByteWithTimeout(tty, 15*time.Millisecond)
+		b, ok := readByteWithTimeout(tty, 50*time.Millisecond)
 		if !ok {
 			break
 		}
 		seq = append(seq, b)
-		if len(seq) >= 2 && seq[0] == '[' && isEscapeTerminator(seq[len(seq)-1]) {
+		if isCompleteEscapeSequence(seq) {
 			break
 		}
 	}
 	return seq
+}
+
+func isCompleteEscapeSequence(seq []byte) bool {
+	if len(seq) == 0 {
+		return false
+	}
+	switch seq[0] {
+	case '[':
+		return len(seq) >= 2 && isEscapeTerminator(seq[len(seq)-1])
+	case 'O':
+		return len(seq) >= 2
+	default:
+		return true
+	}
 }
 
 func isEscapeTerminator(b byte) bool {
@@ -400,6 +499,14 @@ func isEscapeTerminator(b byte) bool {
 }
 
 func readByteWithTimeout(tty *os.File, timeout time.Duration) (byte, bool) {
+	if err := tty.SetReadDeadline(time.Now().Add(timeout)); err == nil {
+		defer tty.SetReadDeadline(time.Time{})
+
+		var b [1]byte
+		_, err := tty.Read(b[:])
+		return b[0], err == nil
+	}
+
 	type result struct {
 		b   byte
 		err error
